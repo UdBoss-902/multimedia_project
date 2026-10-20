@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Multimedia App</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Multimedia</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Upload File</button>
+        </form>
+
+        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+
+        <h2>Gallery / Uploaded Files</h2>
+        {% for item in items %}
+            <div class="item">
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.description }}</p>
+
+                <!-- Media Preview Section -->
+                <div class="media-preview" style="margin: 10px 0;">
+                    {% if item.file.url|lower|slice:"-4:" == ".jpg" or item.file.url|lower|slice:"-4:" == ".png" or item.file.url|lower|slice:"-5:" == ".jpeg" or item.file.url|lower|slice:"-4:" == ".gif" %}
+                        <img src="{{ item.file.url }}" alt="{{ item.title }}" style="max-width: 100%; height: auto; border-radius: 5px;">
+                    {% elif item.file.url|lower|slice:"-4:" == ".mp4" or item.file.url|lower|slice:"-4:" == ".webm" %}
+                        <video controls style="max-width: 100%; border-radius: 5px;">
+                            <source src="{{ item.file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% endif %}
+                </div>
+
+                <small style="color: #888;">Uploaded on: {{ item.uploaded_at|date:"M d, Y H:i" }}</small><br>
+                <a href="{{ item.file.url }}" target="_blank">View / Download File</a>
+            </div>
+        {% empty %}
+            <p style="color: #666;">No multimedia files uploaded yet.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
